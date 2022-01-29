@@ -3,7 +3,6 @@
 <%@ page import="hello.servlet.domain.member.MemberRepository" %>
 
 <%
-
     // request, response는 바로 사용 가능
     MemberRepository memberRepository = MemberRepository.getInstance();
 
