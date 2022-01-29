@@ -22,6 +22,5 @@ public class RequestBodyStringServlet extends HttpServlet {
 
         System.out.println("messegeBody = " + messegeBody);
         response.getWriter().write("OK~!");
-
     }
 }
