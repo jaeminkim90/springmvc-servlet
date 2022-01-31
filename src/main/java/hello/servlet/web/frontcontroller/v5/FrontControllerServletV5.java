@@ -5,7 +5,11 @@ import hello.servlet.web.frontcontroller.MyView;
 import hello.servlet.web.frontcontroller.v3.controller.MemberFormControllerV3;
 import hello.servlet.web.frontcontroller.v3.controller.MemberListControllerV3;
 import hello.servlet.web.frontcontroller.v3.controller.MemberSaveControllerV3;
+import hello.servlet.web.frontcontroller.v4.controller.MemberFormControllerV4;
+import hello.servlet.web.frontcontroller.v4.controller.MemberListControllerV4;
+import hello.servlet.web.frontcontroller.v4.controller.MemberSaveControllerV4;
 import hello.servlet.web.frontcontroller.v5.adapter.ControllerV3HandlerAdapter;
+import hello.servlet.web.frontcontroller.v5.adapter.ControllerV4HandlerAdapter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,18 +35,26 @@ public class FrontControllerServletV5 extends HttpServlet {
 
     private void initHandlerAdapters() {
         handlerAdapters.add(new ControllerV3HandlerAdapter());
+
+        // V4 핸들러 어댑터 추가ㅣ
+        handlerAdapters.add(new ControllerV4HandlerAdapter());
     }
 
     private void initHandlerMappingMap() {
         handlerMappingMap.put("/front-controller/v5/v3/members/new-form", new MemberFormControllerV3());
         handlerMappingMap.put("/front-controller/v5/v3/members/save", new MemberSaveControllerV3());
         handlerMappingMap.put("/front-controller/v5/v3/members", new MemberListControllerV3());
+
+        // V4 핸들러 추가
+        handlerMappingMap.put("/front-controller/v5/v4/members/new-form", new MemberFormControllerV4());
+        handlerMappingMap.put("/front-controller/v5/v4/members/save", new MemberSaveControllerV4());
+        handlerMappingMap.put("/front-controller/v5/v4/members", new MemberListControllerV4());
     }
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        //Handler Mapping Map에서 핸들러(컨트롤러)를 찾는다. => MemberFormControllerV3가 반환된다
+        //Handler Mapping Map에서 핸들러(컨트롤러)를 찾는다.
         Object handler = getHandler(request);
         if (handler == null) {
             // 없을 경우 404 처리
@@ -50,8 +62,7 @@ public class FrontControllerServletV5 extends HttpServlet {
             return;
         }
 
-        // 같은 컨트롤러 인터페이스를 사용하는 핸들러를 찾는다.
-        // 여기서는 ControllerV3HandlerAdapter가 해당
+        // 파라미터로 전달된 핸들러에 사용할 수 있는 어댑터를 찾아온다.
         MyHandlerAdapter adapter = getHandlerAdapter(handler);
 
         // 논리 이름이 담긴 ModelView 반환
@@ -68,7 +79,7 @@ public class FrontControllerServletV5 extends HttpServlet {
 
     private MyHandlerAdapter getHandlerAdapter(Object handler) {
 
-        // MemberFormControllerV3와 인스턴스가 동일한 어댑터를 찾는다.
+        // supports()에 instanceof 조건을 이용하여 핸들러 사용에 필요한 어댑터를 찾는다.
         for (MyHandlerAdapter adapter : handlerAdapters) {
             // handlerAdapters를 모아놓은 List에서 같은 컨트롤러 인터페이스를 사용하는 어댑터 탐색
             if (adapter.supports(handler)) {
